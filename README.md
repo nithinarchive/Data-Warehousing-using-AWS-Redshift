@@ -74,8 +74,4 @@ Leveraged Redshift SQL for advanced analytics and business KPIs:
 
 
 
-![Flow Diagram](https://github.com/SaadAhmedWaqar/Data-Warehousing-Redshift/assets/105427072/12932ef0-4a52-4c31-a190-910439385980)
-
-
-
 
