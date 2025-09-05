@@ -72,6 +72,9 @@ Leveraged Redshift SQL for advanced analytics and business KPIs:
 - Automated scheduling with **AWS Glue Jobs** and **EventBridge** for seamless refreshes.  
 - Ensured data lineage, scalability, and reproducibility for production-grade use cases.  
 
+# Data Warehouse Concept
+
+![Data Warehouse](Data%20Warehouse.jpg)
 
 
 !
