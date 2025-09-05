@@ -1,4 +1,4 @@
-# **Enterprise Data Warehousing using Amazon Redshift**  
+# **Enterprise Data Warehousing using Amazon Redshift By Nithin Suresh**  
 
 ## **Problem Statement**  
 Design and implement a scalable **data warehousing solution** for a retail business, leveraging **AWS S3, Redshift, and ETL pipelines**. The goal is to transform raw transactional data into an optimized **Star Schema** that supports historical tracking (SCD Type 2), efficient querying, and advanced business insights.  
