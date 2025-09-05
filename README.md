@@ -1,57 +1,77 @@
-# Data-Warehousing-Redshift
+# **Enterprise Data Warehousing using Amazon Redshift**  
 
-## Problem: S3(Relational Data) to Star Schema ETL
-### Part 1: Relational Schema Design:
-1.	Customers (CustomerID, FirstName, LastName, Email, Address, City, State, ZipCode, LastModified)
-2.	Products (ProductID, ProductName, Category, Description, Price, LastModified)
-3.	Stores (StoreID, StoreName, Address, City, State, ZipCode, LastModified)
-4.	Orders (OrderID, CustomerID, StoreID, OrderDate, TotalPrice, LastModified)
-5.	OrderDetails (OrderID, ProductID, Quantity, Price, LastModified)
+## **Problem Statement**  
+Design and implement a scalable **data warehousing solution** for a retail business, leveraging **AWS S3, Redshift, and ETL pipelines**. The goal is to transform raw transactional data into an optimized **Star Schema** that supports historical tracking (SCD Type 2), efficient querying, and advanced business insights.  
 
-### Part 2: Data Population
-Use ChatGPT or any other data generation method to populate the CSV files with random data for each table. Ensure that the data is realistic and consistent with the schema.
+---
 
-### Part 3: Data Import to S3 Bucket
-•	Create an S3 bucket in your AWS account.
-•	Upload these CSV files to the S3 bucket.
+## **Project Workflow**  
 
-### Part 4: Data Copy to Redshift Cluster
-•	Create a Redshift cluster in your AWS account.
-•	Configure the necessary security groups, network settings, and access permissions.
-•	Use the Redshift COPY command to load the data from the S3 bucket into the Redshift tables. Ensure that the tables are created in Redshift with the same schema as in the csv file.
+### **1. Relational Schema Design (OLTP Layer)**  
+Modeled a **normalized relational schema** to capture day-to-day retail transactions:  
+- **Customers**: (CustomerID, FirstName, LastName, Email, Address, City, State, ZipCode, LastModified)  
+- **Products**: (ProductID, ProductName, Category, Description, Price, LastModified)  
+- **Stores**: (StoreID, StoreName, Address, City, State, ZipCode, LastModified)  
+- **Orders**: (OrderID, CustomerID, StoreID, OrderDate, TotalPrice, LastModified)  
+- **OrderDetails**: (OrderID, ProductID, Quantity, Price, LastModified)  
 
-### Part 5: Data Transformation to Star Schema (SCD Type 2) and Upserting using Staging Table
-•	Create a star schema for retail sales.
-•	Write SQL queries to transform the data from the relational schema into a star schema using SCD Type 2. Perform the necessary data transformations to populate these tables with the appropriate historical changes using SCD Type 2.
-•	Update and Insert (upsert) the updated data in the star schema using staging tables. 
-•	It is assumed that every table will have a directory in S3 and a new file will be uploaded each time there’s an update in the data. There will be a new file in S3 location. 
+This schema reflects the transactional source system (OLTP) and ensures data consistency.  
 
+---
 
-### Part 6: Insights Generation with SQL Queries
-Write SQL queries to extract insights from the transformed star schema.
-Top Selling Products:
-Find the top 10 best-selling products based on the total quantity sold. Include the product name, category, and the total quantity sold.
+### **2. Data Generation & Population**  
+- Generated **synthetic yet realistic datasets** using ChatGPT-driven data generation and Python scripts.  
+- Produced CSV files for each table, ensuring **referential integrity** across relationships (e.g., Orders referencing Customers, OrderDetails referencing Products).  
 
-#### Monthly Sales Trend:
-Determine the monthly sales trend by calculating the total sales revenue for each month in a given year. 
-Sales Performance Comparison:
-Compare the sales performance of different stores by calculating the total sales revenue for each store. Rank the stores based on their sales revenue.
+---
 
-#### Seasonal Sales Analysis:
-Analyze the seasonal sales patterns by calculating the total sales revenue for each quarter of a given year. Identify the quarter with the highest sales revenue.
-Average Order Value:
-Calculate the average order value by dividing the total sales revenue by the total number of orders. Analyze the average order value trends over time and identify any significant changes.
+### **3. Data Ingestion into S3 (Data Lake Layer)**  
+- Provisioned an **Amazon S3 bucket** as the raw data landing zone.  
+- Organized data into directories by table name for versioned uploads (e.g., `/customers/`, `/orders/`).  
+- Each update cycle pushes a new file, preserving a full **immutable data history** in S3.  
 
-#### Store Location Analysis:
-Analyze the sales performance based on store location by calculating the total sales revenue for each city or state
+---
 
-### Part 7 : Create a Data Pipeline to automate above tasks 
+### **4. Data Loading into Redshift (Staging Layer)**  
+- Launched a **Redshift cluster** with proper VPC, IAM, and security group configurations.  
+- Created staging tables mirroring the relational schema.  
+- Used the **Redshift COPY command** for high-performance parallel ingestion of CSVs from S3 into staging.  
 
+---
 
+### **5. Data Transformation into Star Schema (Warehouse Layer)**  
+- Modeled a **Star Schema** optimized for analytics:  
+  - **FactSales** (Fact table: sales transactions)  
+  - **DimCustomer** (Slowly Changing Dimension Type 2 for historical customer changes)  
+  - **DimProduct** (Product catalog with versioning support)  
+  - **DimStore** (Store details with historical tracking)  
+  - **DimDate** (Calendar dimension for time-series analysis)  
+- Built **SCD Type 2 logic** in SQL to handle updates and maintain historical accuracy.  
+- Implemented **Upsert pipelines** via staging tables:  
+  - New records → Inserted.  
+  - Updated records → Versioned with validity dates.  
 
-# Solution:
+---
 
-**Dimesional Modelling Flow Diagram**
+### **6. Analytical Insights (BI Layer)**  
+Leveraged Redshift SQL for advanced analytics and business KPIs:  
+- **Top 10 Products:** Ranked by total sales volume (Quantity Sold).  
+- **Monthly Sales Trend:** Aggregated revenue per month, enabling YOY/seasonality analysis.  
+- **Store Performance:** Ranked stores by total revenue to identify best/worst performers.  
+- **Seasonal Analysis:** Quarterly revenue trends to uncover high-sales periods.  
+- **Average Order Value (AOV):** Calculated total revenue ÷ total orders, monitored over time.  
+- **Geo Insights:** Sales performance by **city and state**, highlighting regional strengths.  
+
+---
+
+### **7. Data Pipeline Automation**  
+- Designed an **end-to-end ETL pipeline** using AWS Glue and Python scripts:  
+  - **Extract:** Ingest CSVs from S3.  
+  - **Transform:** Apply SCD Type 2 and star schema modeling in staging/warehouse layers.  
+  - **Load:** Upsert into fact and dimension tables in Redshift.  
+- Automated scheduling with **AWS Glue Jobs** and **EventBridge** for seamless refreshes.  
+- Ensured data lineage, scalability, and reproducibility for production-grade use cases.  
+
 
 
 ![Flow Diagram](https://github.com/SaadAhmedWaqar/Data-Warehousing-Redshift/assets/105427072/12932ef0-4a52-4c31-a190-910439385980)
